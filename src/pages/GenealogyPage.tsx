@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
-import type { MouseEvent as ReactMouseEvent, WheelEvent as ReactWheelEvent } from 'react';
+import type { MouseEvent as ReactMouseEvent, WheelEvent as ReactWheelEvent, TouchEvent as ReactTouchEvent } from 'react';
 import type { Person } from '../types/types';
 import {
   getFormattedName,
@@ -13,8 +13,7 @@ interface Props {
   persons: Person[];
 }
 
-const FOCUS_DIMMED_OPACITY = 0.5;
-
+const FOCUS_DIMMED_OPACITY = 0.4;
 const CARD_WIDTH = 190;
 const CARD_HEIGHT = 72;
 const PHOTO_DIAMETER = 42;
@@ -25,8 +24,8 @@ const LEVEL_HEIGHT = 180;
 function emptyPerson(id: string): Person {
   return {
     id, nomNaissance: '', prenom: id, autresPrenoms: '',
-    dateNaissance: '', jourMoisNaissance: '', dateDeces: '',
-    mere: '', pere: '', conjoint: '', sexe: '', maison: '',
+    dateNaissance: '', jourMoisNaissance: '', dateDeces: '', jourMoisDeces: '',
+    mere: '', pere: '', conjoint: '', sexe: '', maison: '', divorced: false, quizz: false,
   };
 }
 
@@ -36,37 +35,34 @@ export default function GenealogyPage({ persons }: Props) {
 
   const [transform, setTransform] = useState({ x: 0, y: 0, scale: 0.8 });
   const [isDragging, setIsDragging] = useState(false);
-  const dragState = useRef({ x: 0, y: 0, tx: 0, ty: 0, moved: false });
+  const dragState = useRef({ x: 0, y: 0, tx: 0, ty: 0, moved: false, pinchDist: 0, pinchScale: 1 });
+  const hasCenteredInitially = useRef(false);
 
   const personMap = useMemo(() => new Map(persons.map(p => [p.id, p])), [persons]);
   
   const findOrEmpty = (id: string) => persons.find((p) => p.id === id) || emptyPerson(id);
 
-  // --- FONCTION DE FORMATAGE DU NOM (AVEC GESTION NOM DE MARIAGE) ---
   const getDisplayName = (p: Person): string => {
     if (!p) return '';
     const isFemale = p.sexe?.toUpperCase() === 'F';
     const spouse = p.conjoint ? personMap.get(p.conjoint) : undefined;
+    const isDivorced = p.divorced;
 
-    if (isFemale && spouse) {
+    if (isFemale && spouse && !isDivorced) {
       const husbandNom = spouse.nomNaissance;
       const birthName = p.nomNaissance;
-
       if (husbandNom) {
         return `${p.prenom} ${husbandNom}${birthName ? ` née ${birthName}` : ''}`;
       }
     }
-
     return getFormattedName(p);
   };
 
-  // --- OBTENTION DES ENFANTS DE LA PERSONNE SÉLECTIONNÉE ---
   const selectedPersonChildren = useMemo(() => {
     if (!selectedPerson) return [];
     return persons.filter(p => p.mere === selectedPerson.id || p.pere === selectedPerson.id);
   }, [selectedPerson, persons]);
 
-  // --- IDENTIFICATION DE L'ARBRE VISUEL ---
   const closeFamily = useMemo(() => {
     const ids = new Set<string>();
     if (!selectedPerson) return ids;
@@ -78,16 +74,11 @@ export default function GenealogyPage({ persons }: Props) {
     if (selectedPerson.pere) ids.add(selectedPerson.pere);
 
     let hasGrandChildren = false;
-
     const children = persons.filter(c => c.mere === pId || c.pere === pId);
     children.forEach(c => {
       ids.add(c.id);
-      
       const grandChildren = persons.filter(gc => gc.mere === c.id || gc.pere === c.id);
-      if (grandChildren.length > 0) {
-        hasGrandChildren = true;
-      }
-      
+      if (grandChildren.length > 0) hasGrandChildren = true;
       grandChildren.forEach(gc => ids.add(gc.id));
     });
 
@@ -100,7 +91,6 @@ export default function GenealogyPage({ persons }: Props) {
         }
       });
     }
-
     return ids;
   }, [selectedPerson, persons]);
 
@@ -109,7 +99,6 @@ export default function GenealogyPage({ persons }: Props) {
     return 1;
   };
 
-  // --- CALCUL RECURSIF DU LAYOUT ---
   const layout = useMemo(() => {
     const personChildren = new Map<string, Person[]>();
     persons.forEach(p => {
@@ -150,7 +139,6 @@ export default function GenealogyPage({ persons }: Props) {
       }
     });
 
-    // 2. Hiérarchisation
     units.forEach(u => {
       const childUnits = new Set<any>();
       u.members.forEach((m: Person) => {
@@ -165,7 +153,6 @@ export default function GenealogyPage({ persons }: Props) {
       u.children = Array.from(childUnits);
     });
 
-    // 3. Niveaux Y (Parcours BFS)
     const queue = Array.from(units.values()).filter(u => u.isRoot).map(u => ({ u, lvl: 0 }));
     const visited = new Set();
     while (queue.length > 0) {
@@ -175,24 +162,17 @@ export default function GenealogyPage({ persons }: Props) {
       u.level = lvl;
       u.children.forEach((c: any) => queue.push({ u: c, lvl: lvl + 1 }));
     }
-    units.forEach(u => {
-      if (!visited.has(u)) { u.level = 0; visited.add(u); }
-    });
+    units.forEach(u => { if (!visited.has(u)) { u.level = 0; visited.add(u); } });
 
-    // 4. Calcul récursif de la largeur
     const calculateWidth = (u: any) => {
       if (u.widthCalculated) return u.width;
       u.widthCalculated = true;
-      u.ownWidth = u.members.length === 2 
-        ? SPOUSE_GAP + CARD_WIDTH + (PHOTO_DIAMETER / 2) 
-        : CARD_WIDTH;
-      
+      u.ownWidth = u.members.length === 2 ? SPOUSE_GAP + CARD_WIDTH + (PHOTO_DIAMETER / 2) : CARD_WIDTH;
       let childrenTotalWidth = 0;
       u.children.forEach((c: any, idx: number) => {
         childrenTotalWidth += calculateWidth(c);
         if (idx < u.children.length - 1) childrenTotalWidth += UNIT_GAP;
       });
-      
       u.childrenTotalWidth = childrenTotalWidth;
       u.width = Math.max(u.ownWidth, childrenTotalWidth);
       return u.width;
@@ -202,35 +182,22 @@ export default function GenealogyPage({ persons }: Props) {
     roots.forEach(r => calculateWidth(r));
     units.forEach(u => calculateWidth(u));
 
-    // 5. Coordonnées X
     let currentX = 0;
     const assignX = (u: any, leftBound: number) => {
       if (u.xAssigned) return;
       u.xAssigned = true;
       u.x = leftBound + u.width / 2;
-      
       let childLeft = u.x - u.childrenTotalWidth / 2;
-      u.children.forEach((c: any) => {
-        assignX(c, childLeft);
-        childLeft += c.width + UNIT_GAP;
-      });
+      u.children.forEach((c: any) => { assignX(c, childLeft); childLeft += c.width + UNIT_GAP; });
     };
 
-    roots.forEach(r => {
-      assignX(r, currentX);
-      currentX += r.width + UNIT_GAP * 2;
-    });
-    units.forEach(u => {
-      if (!u.xAssigned) {
-        assignX(u, currentX);
-        currentX += u.width + UNIT_GAP * 2;
-      }
-    });
+    roots.forEach(r => { assignX(r, currentX); currentX += r.width + UNIT_GAP * 2; });
+    units.forEach(u => { if (!u.xAssigned) { assignX(u, currentX); currentX += u.width + UNIT_GAP * 2; }});
 
-    // 6. Cartes finales avec décalage pour le conjoint de droite
     const memberX = new Map<string, number>();
     const levelMap = new Map<string, number>();
     const childrenByUnion = new Map<string, string[]>();
+    const couples: any[] = []; // NOUVEAU: Extraction de tous les couples
 
     units.forEach(u => {
       if (u.members.length === 2) {
@@ -239,6 +206,14 @@ export default function GenealogyPage({ persons }: Props) {
         memberX.set(m2.id, u.x + SPOUSE_GAP / 2 - CARD_WIDTH / 2 + (PHOTO_DIAMETER / 2));
         levelMap.set(m1.id, u.level);
         levelMap.set(m2.id, u.level);
+        
+        // Ajout du couple, divorcé si l'un ou l'autre a la propriété à true
+        couples.push({
+          id1: m1.id,
+          id2: m2.id,
+          isDivorced: m1.divorced || m2.divorced,
+          unionKey: [m1.id, m2.id].sort().join('::')
+        });
       } else {
         const m = u.members[0];
         memberX.set(m.id, u.x - CARD_WIDTH / 2);
@@ -255,27 +230,21 @@ export default function GenealogyPage({ persons }: Props) {
       }
     });
 
-    return { memberX, levelMap, childrenByUnion };
+    return { memberX, levelMap, childrenByUnion, couples };
   }, [persons, personMap]);
 
-  // --- AUTO-ZOOM SUR LA FAMILLE SÉLECTIONNÉE ---
+  // --- CENTRAGE INITIAL (Uniquement au chargement, évite les sauts d'écran) ---
   useEffect(() => {
-    if (!selectedPerson || !containerRef.current || closeFamily.size === 0) return;
+    if (hasCenteredInitially.current || layout.memberX.size === 0 || !containerRef.current) return;
     
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    
-    closeFamily.forEach(id => {
-      const x = layout.memberX.get(id);
+    layout.memberX.forEach((x, id) => {
       const y = (layout.levelMap.get(id) ?? 0) * LEVEL_HEIGHT;
-      if (x !== undefined) {
-        minX = Math.min(minX, x);
-        maxX = Math.max(maxX, x + CARD_WIDTH);
-        minY = Math.min(minY, y);
-        maxY = Math.max(maxY, y + CARD_HEIGHT);
-      }
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x + CARD_WIDTH);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y + CARD_HEIGHT);
     });
-
-    if (minX === Infinity) return;
 
     const padding = 80;
     const w = maxX - minX;
@@ -283,24 +252,22 @@ export default function GenealogyPage({ persons }: Props) {
     const cx = (minX + maxX) / 2;
     const cy = (minY + maxY) / 2;
 
-    setTimeout(() => {
-      if (!containerRef.current) return;
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
-      
-      const scaleX = (width - padding * 2) / (w || 1);
-      const scaleY = (height - padding * 2) / (h || 1);
-      const targetScale = Math.min(scaleX, scaleY, 1.2); 
+    const width = containerRef.current.clientWidth;
+    const height = containerRef.current.clientHeight;
+    
+    const scaleX = (width - padding * 2) / (w || 1);
+    const scaleY = (height - padding * 2) / (h || 1);
+    const targetScale = Math.min(scaleX, scaleY, 0.8); 
 
-      setTransform({
-        x: width / 2 - targetScale * cx,
-        y: height / 2 - targetScale * cy,
-        scale: targetScale
-      });
-    }, 300);
-  }, [selectedPerson, closeFamily, layout]);
+    setTransform({
+      x: width / 2 - targetScale * cx,
+      y: height / 2 - targetScale * cy,
+      scale: targetScale
+    });
+    hasCenteredInitially.current = true;
+  }, [layout]);
 
-  // --- GESTION DES ÉVÉNEMENTS ---
+  // --- GESTION DES ÉVÉNEMENTS (Amélioré pour Mobile) ---
   const handleWheel = (e: ReactWheelEvent) => {
     const scaleAdj = e.deltaY > 0 ? 0.9 : 1.1;
     setTransform(prev => ({ ...prev, scale: Math.max(0.1, Math.min(prev.scale * scaleAdj, 3)) }));
@@ -308,7 +275,7 @@ export default function GenealogyPage({ persons }: Props) {
 
   const handlePointerDown = (e: ReactMouseEvent) => {
     setIsDragging(true);
-    dragState.current = { x: e.clientX, y: e.clientY, tx: transform.x, ty: transform.y, moved: false };
+    dragState.current = { ...dragState.current, x: e.clientX, y: e.clientY, tx: transform.x, ty: transform.y, moved: false };
   };
 
   const handlePointerMove = (e: ReactMouseEvent) => {
@@ -319,47 +286,88 @@ export default function GenealogyPage({ persons }: Props) {
     setTransform(prev => ({ ...prev, x: dragState.current.tx + dx, y: dragState.current.ty + dy }));
   };
 
-  const handleSvgClick = () => {
-    if (!dragState.current.moved) {
-      setSelectedPerson(null);
+  // NOUVEAU: Pinch-to-zoom pour mobile
+  const handleTouchStart = (e: ReactTouchEvent) => {
+    if (e.touches.length === 2) {
+      setIsDragging(false);
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+      dragState.current.pinchDist = dist;
+      dragState.current.pinchScale = transform.scale;
     }
+  };
+
+  const handleTouchMove = (e: ReactTouchEvent) => {
+    if (e.touches.length === 2) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+      if (dragState.current.pinchDist) {
+        const newScale = dragState.current.pinchScale * (dist / dragState.current.pinchDist);
+        setTransform(prev => ({ ...prev, scale: Math.max(0.1, Math.min(newScale, 3)) }));
+      }
+    }
+  };
+
+  const handleSvgClick = () => {
+    if (!dragState.current.moved) setSelectedPerson(null);
   };
 
   const handleNodeClick = (p: Person, e: ReactMouseEvent) => {
     e.stopPropagation();
-    if (!dragState.current.moved) {
-      setSelectedPerson(p);
-    }
+    if (!dragState.current.moved) setSelectedPerson(p);
   };
 
+  // --- DESSIN DES LIENS (Couples sans enfants + Divorces) ---
   const renderLinks = () => {
     const paths: React.ReactNode[] = [];
     
+    // 1. Dessiner TOUTES les lignes de couples (même sans enfants)
+    layout.couples.forEach(couple => {
+      const { id1, id2, isDivorced, unionKey } = couple;
+      const p1X = layout.memberX.get(id1);
+      const p2X = layout.memberX.get(id2);
+      const p1Lvl = layout.levelMap.get(id1) || 0;
+
+      if (p1X !== undefined && p2X !== undefined) {
+        const leftX = Math.min(p1X, p2X);
+        const rightX = Math.max(p1X, p2X);
+        const minX = leftX + CARD_WIDTH;
+        const maxX = rightX - PHOTO_DIAMETER / 2;
+        const unionY = p1Lvl * LEVEL_HEIGHT + CARD_HEIGHT / 2;
+        const unionX = (minX + maxX) / 2;
+
+        paths.push(
+          <line 
+            key={`couple-${unionKey}`} 
+            x1={minX} y1={unionY} x2={maxX} y2={unionY} 
+            className="tree-union-line" 
+            strokeDasharray={isDivorced ? "6,6" : "none"} // Pointillé si divorcé
+          />
+        );
+        paths.push(<circle key={`dot-${unionKey}`} cx={unionX} cy={unionY} r={5} fill={isDivorced ? "#a3827e" : "#7a2035"} />);
+      }
+    });
+
+    // 2. Dessiner les lignes vers les enfants
     layout.childrenByUnion.forEach((childrenIds, unionKey) => {
       const parents = unionKey.split('::');
-      let unionX = 0;
-      let unionY = 0;
-
-      const p1X = layout.memberX.get(parents[0]);
-      const p1Lvl = layout.levelMap.get(parents[0]) || 0;
-      if (p1X === undefined) return;
+      let unionX = 0, unionY = 0;
 
       if (parents.length === 2) {
+        const p1X = layout.memberX.get(parents[0]);
         const p2X = layout.memberX.get(parents[1]);
-        if (p2X !== undefined) {
-          const leftX = Math.min(p1X, p2X);
-          const rightX = Math.max(p1X, p2X);
-
-          const minX = leftX + CARD_WIDTH;
-          const maxX = rightX - PHOTO_DIAMETER / 2;
-          
-          unionY = p1Lvl * LEVEL_HEIGHT + CARD_HEIGHT / 2;
-          unionX = (minX + maxX) / 2;
-          
-          paths.push(<line key={`couple-${unionKey}`} x1={minX} y1={unionY} x2={maxX} y2={unionY} className="tree-union-line" />);
-          paths.push(<circle key={`dot-${unionKey}`} cx={unionX} cy={unionY} r={5} fill="#7a2035" />);
-        }
+        const p1Lvl = layout.levelMap.get(parents[0]) || 0;
+        if (p1X === undefined || p2X === undefined) return;
+        const leftX = Math.min(p1X, p2X);
+        const rightX = Math.max(p1X, p2X);
+        unionY = p1Lvl * LEVEL_HEIGHT + CARD_HEIGHT / 2;
+        unionX = (leftX + CARD_WIDTH + rightX - PHOTO_DIAMETER / 2) / 2;
       } else {
+        const p1X = layout.memberX.get(parents[0]);
+        const p1Lvl = layout.levelMap.get(parents[0]) || 0;
+        if (p1X === undefined) return;
         unionX = p1X + CARD_WIDTH / 2;
         unionY = p1Lvl * LEVEL_HEIGHT + CARD_HEIGHT;
       }
@@ -381,6 +389,7 @@ export default function GenealogyPage({ persons }: Props) {
 
       paths.push(<path key={`rake-${unionKey}`} d={d} className="tree-link" />);
     });
+
     return paths;
   };
 
@@ -399,6 +408,8 @@ export default function GenealogyPage({ persons }: Props) {
           onPointerMove={handlePointerMove}
           onPointerUp={() => setIsDragging(false)}
           onPointerLeave={() => setIsDragging(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
           onClick={handleSvgClick}
           style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
         >
@@ -424,18 +435,8 @@ export default function GenealogyPage({ persons }: Props) {
                     style={{ cursor: 'pointer' }}
                     onClick={(e) => handleNodeClick(p, e)}
                   >
-                    <rect
-                      width={CARD_WIDTH}
-                      height={CARD_HEIGHT}
-                      rx={10}
-                      fill={isFemale ? '#fcf0f2' : '#f0f4f8'}
-                      stroke={isSelected ? '#7a2035' : (isFemale ? '#d98293' : '#7b9cb8')}
-                      strokeWidth={isSelected ? 2.5 : 1.5}
-                    />
-
-                    <clipPath id={`clip-${p.id}`}>
-                      <circle cx={0} cy={CARD_HEIGHT / 2} r={PHOTO_DIAMETER / 2} />
-                    </clipPath>
+                    <rect width={CARD_WIDTH} height={CARD_HEIGHT} rx={10} fill={isFemale ? '#fcf0f2' : '#f0f4f8'} stroke={isSelected ? '#7a2035' : (isFemale ? '#d98293' : '#7b9cb8')} strokeWidth={isSelected ? 2.5 : 1.5} />
+                    <clipPath id={`clip-${p.id}`}><circle cx={0} cy={CARD_HEIGHT / 2} r={PHOTO_DIAMETER / 2} /></clipPath>
                     <rect x={-PHOTO_DIAMETER/2} y={CARD_HEIGHT/2 - PHOTO_DIAMETER/2} width={PHOTO_DIAMETER} height={PHOTO_DIAMETER} fill="#e5dacb" clipPath={`url(#clip-${p.id})`} />
                     <image href={getPhotoUrl(p.id)} x={-PHOTO_DIAMETER/2} y={CARD_HEIGHT/2 - PHOTO_DIAMETER/2} width={PHOTO_DIAMETER} height={PHOTO_DIAMETER} clipPath={`url(#clip-${p.id})`} preserveAspectRatio="xMidYMid slice" />
                     <circle cx={0} cy={CARD_HEIGHT / 2} r={PHOTO_DIAMETER / 2} fill="none" stroke="#ffffff" strokeWidth={2} />
@@ -463,9 +464,7 @@ export default function GenealogyPage({ persons }: Props) {
           {selectedPerson && (
             <div className="detail-panel-inner">
               <button className="close-btn" onClick={() => setSelectedPerson(null)}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
               </button>
               <div className="detail-photo-wrap">
                 <img className="detail-photo" src={getPhotoUrl(selectedPerson.id)} alt={getDisplayName(selectedPerson)} onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_SILHOUETTE; }} />
@@ -476,13 +475,8 @@ export default function GenealogyPage({ persons }: Props) {
                 <div className="detail-info">
                   {selectedPerson.maison && (<div className="detail-row"><span className="label">Maison</span><span className="value">{selectedPerson.maison}</span></div>)}
                   <div className="detail-row"><span className="label">Sexe</span><span className="value">{selectedPerson.sexe === 'F' ? 'Femme' : 'Homme'}</span></div>
-                  {selectedPerson.dateNaissance && (
-                    <div className="detail-row">
-                      <span className="label">Naissance</span>
-                      <span className="value">{selectedPerson.jourMoisNaissance ? `${selectedPerson.jourMoisNaissance}/` : ''}{selectedPerson.dateNaissance}</span>
-                    </div>
-                  )}
-                  {selectedPerson.dateDeces && (<div className="detail-row"><span className="label">Décès</span><span className="value">{selectedPerson.dateDeces}</span></div>)}
+                  {selectedPerson.dateNaissance && (<div className="detail-row"><span className="label">Naissance</span><span className="value">{selectedPerson.jourMoisNaissance ? `${selectedPerson.jourMoisNaissance}/` : ''}{selectedPerson.dateNaissance}</span></div>)}
+                  {selectedPerson.dateDeces && (<div className="detail-row"><span className="label">Décès</span><span className="value">{selectedPerson.jourMoisDeces ? `${selectedPerson.jourMoisDeces}/` : ''}{selectedPerson.dateDeces}</span></div>)}
                   <div className="detail-row"><span className="label">Statut / Âge</span><span className="value">{getFormattedDateAndAge(selectedPerson).ageText || 'Inconnu'}</span></div>
                   
                   {selectedPerson.conjoint && (() => {
@@ -492,18 +486,14 @@ export default function GenealogyPage({ persons }: Props) {
                       <div className="detail-row">
                         <span className="label">{isSpouseFemale ? 'Conjointe' : 'Conjoint'}</span>
                         <span className="value clickable-link" onClick={() => setSelectedPerson(spouse)}>
-                          {getDisplayName(spouse)}
+                          {getDisplayName(spouse)} {selectedPerson.divorced && '(Divorcé(e))'}
                         </span>
                       </div>
                     );
                   })()}
 
-                  {selectedPerson.mere && (
-                    <div className="detail-row"><span className="label">Mère</span><span className="value clickable-link" onClick={() => setSelectedPerson(findOrEmpty(selectedPerson.mere))}>{getDisplayName(findOrEmpty(selectedPerson.mere))}</span></div>
-                  )}
-                  {selectedPerson.pere && (
-                    <div className="detail-row"><span className="label">Père</span><span className="value clickable-link" onClick={() => setSelectedPerson(findOrEmpty(selectedPerson.pere))}>{getDisplayName(findOrEmpty(selectedPerson.pere))}</span></div>
-                  )}
+                  {selectedPerson.mere && (<div className="detail-row"><span className="label">Mère</span><span className="value clickable-link" onClick={() => setSelectedPerson(findOrEmpty(selectedPerson.mere))}>{getDisplayName(findOrEmpty(selectedPerson.mere))}</span></div>)}
+                  {selectedPerson.pere && (<div className="detail-row"><span className="label">Père</span><span className="value clickable-link" onClick={() => setSelectedPerson(findOrEmpty(selectedPerson.pere))}>{getDisplayName(findOrEmpty(selectedPerson.pere))}</span></div>)}
 
                   {selectedPersonChildren.length > 0 && (
                     <div className="detail-row">
@@ -511,12 +501,7 @@ export default function GenealogyPage({ persons }: Props) {
                       <span className="value">
                         {selectedPersonChildren.map((child, index) => (
                           <React.Fragment key={child.id}>
-                            <span
-                              className="clickable-link"
-                              onClick={() => setSelectedPerson(child)}
-                            >
-                              {getDisplayName(child)}
-                            </span>
+                            <span className="clickable-link" onClick={() => setSelectedPerson(child)}>{getDisplayName(child)}</span>
                             {index < selectedPersonChildren.length - 1 && ', '}
                           </React.Fragment>
                         ))}

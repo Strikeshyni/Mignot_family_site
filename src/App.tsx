@@ -29,6 +29,7 @@ export default function App() {
   }, []);
 
   const persons = useMemo(() => parseCSV(csvContent), [csvContent]);
+  const quizzPersons = useMemo(() => persons.filter((p) => p.quizz), [persons]);
 
   if (isLoading) {
     return <div className="loading-state">Chargement de l'arbre...</div>;
@@ -58,7 +59,7 @@ export default function App() {
         {page === 'genealogie' ? (
           <GenealogyPage persons={persons} />
         ) : (
-          <GamesPage persons={persons} />
+          <GamesPage persons={quizzPersons} />
         )}
       </div>
     </div>

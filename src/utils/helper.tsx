@@ -34,38 +34,94 @@ export function parseCSV(csvText: string): Person[] {
         dateNaissance: row['Date naissance'] || '',
         jourMoisNaissance: row['Jour/mois naissance'] || '',
         dateDeces: row['Date décès'] || '',
+        jourMoisDeces: row['Jour/mois décès'] || '',
         mere: row['Mère'] || '',
         pere: row['Père'] || '',
         enfants: row['Enfants'] || '',
         conjoint: row['Conjoint'] || '',
         sexe: row['Sexe'] || '',
         maison: row['Maison'] || '',
+        divorced: row['Divorcé'] === 'TRUE',
+        quizz: row['Quizz'] === 'TRUE',
       };
     });
 }
 
 export function getFormattedName(p: Person): string {
-  const nom = p.nomNaissance;
-  return `${p.prenom} ${nom}`.trim();
+  return `${p.prenom} ${p.nomNaissance}`.trim();
 }
 
 export function getFormattedDateAndAge(p: Person): { displayDate: string; ageText: string } {
   const birthYear = parseInt(p.dateNaissance, 10);
   const deathYear = parseInt(p.dateDeces, 10);
-  const currentYear = new Date().getFullYear();
+  
+  // 1. Construction de la date d'affichage (Ex: "15/04/1990 - 20/11/2020")
+  let displayDate = p.dateNaissance || '';
+  if (p.jourMoisNaissance && p.dateNaissance) {
+    displayDate = `${p.jourMoisNaissance}/${p.dateNaissance}`;
+  }
+  
+  if (p.dateDeces) {
+    let decesStr = p.dateDeces;
+    if (p.jourMoisDeces) {
+      decesStr = `${p.jourMoisDeces}/${p.dateDeces}`;
+    }
+    displayDate += displayDate ? ` - ${decesStr}` : decesStr;
+  }
 
-  let displayDate = p.dateNaissance;
-  if (p.dateDeces) displayDate += ` - ${p.dateDeces}`;
-
+  // 2. Calcul précis de l'âge
   let ageText = '';
+  
   if (!isNaN(birthYear)) {
-    if (!isNaN(deathYear)) {
-      ageText = `décédé à ${deathYear - birthYear} ans`;
-      if (deathYear - birthYear < 1) {
-        ageText = `décédé à moins d'un an`;
+    // Fonction utilitaire pour extraire le jour et le mois depuis "JJ/MM"
+    const parseDM = (dm: string | undefined) => {
+      if (!dm) return null;
+      const parts = dm.split('/');
+      if (parts.length >= 2) {
+        return { day: parseInt(parts[0], 10), month: parseInt(parts[1], 10) };
       }
+      return null;
+    };
+
+    const bDM = parseDM(p.jourMoisNaissance);
+    const isFemale = p.sexe?.toUpperCase() === 'F';
+    const decedeText = isFemale ? 'décédée' : 'décédé';
+
+    if (!isNaN(deathYear)) {
+      // --- PERSONNE DÉCÉDÉE ---
+      let age = deathYear - birthYear;
+      const dDM = parseDM(p.jourMoisDeces);
+      
+      // Ajustement : si le mois/jour de décès est AVANT le mois/jour de naissance, on enlève 1 an
+      if (bDM && dDM) {
+        if (dDM.month < bDM.month || (dDM.month === bDM.month && dDM.day < bDM.day)) {
+          age--;
+        }
+      }
+      
+      if (age < 1) {
+        ageText = `${decedeText} à moins d'un an`;
+      } else {
+        ageText = `${decedeText} à ${age} ans`;
+      }
+
     } else {
-      ageText = `${currentYear - birthYear} ans`;
+      // --- PERSONNE VIVANTE ---
+      const today = new Date();
+      let age = today.getFullYear() - birthYear;
+      
+      // Ajustement : si l'anniversaire n'est pas encore passé cette année, on enlève 1 an
+      if (bDM) {
+        const currentMonth = today.getMonth() + 1; // getMonth() commence à 0
+        const currentDay = today.getDate();
+        if (currentMonth < bDM.month || (currentMonth === bDM.month && currentDay < bDM.day)) {
+          age--;
+        }
+      }
+      
+      if (age >= 0) {
+        ageText = `${age} ans`;
+      }
     }
   }
 
