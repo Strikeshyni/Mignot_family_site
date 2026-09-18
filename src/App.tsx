@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import { parseCSV } from './utils/helper';
 import GenealogyPage from './pages/GenealogyPage';
