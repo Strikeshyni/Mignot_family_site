@@ -1,0 +1,208 @@
+.genealogy-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Wrapper côte-à-côte (Desktop par défaut) */
+.genealogy-content {
+  display: flex;
+  flex-direction: row; /* Disposition horizontale */
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Le graphe prend tout l'espace disponible et rétrécit dynamiquement */
+.network-container {
+  flex: 1;
+  min-width: 0;
+  min-height: 0; /* Important pour que le SVG rétrécisse en colonne */
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Panneau latéral rétractable (Version Bureau) */
+.detail-panel {
+  width: 0;
+  height: 100%;
+  background: #f7f3ec;
+  border-left: 0px solid #dcd3c5;
+  box-shadow: -8px 0 30px rgba(59, 45, 40, 0.08);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-left-width 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.detail-panel.open {
+  width: 360px;
+  border-left-width: 1px;
+}
+
+.detail-panel-inner {
+  width: 360px;
+  height: 90%; /* Remplacé 90% par 100% pour un scroll fluide sur toute la hauteur */
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* --- NOUVEAU : VERSION MOBILE / PETITS ÉCRANS --- */
+@media (max-width: 800px) {
+  .genealogy-content {
+    flex-direction: column; /* Empile le graphe et le panneau verticalement */
+  }
+
+  .detail-panel {
+    width: 100%;
+    height: 0; /* Fermé par défaut via la hauteur */
+    border-left: none; /* Supprime la bordure latérale */
+    border-top: 0px solid #dcd3c5;
+    box-shadow: 0 -8px 30px rgba(59, 45, 40, 0.08); /* L'ombre pointe vers le haut */
+    
+    /* On change la transition pour animer la hauteur au lieu de la largeur */
+    transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-top-width 0.3s ease;
+  }
+
+  .detail-panel.open {
+    width: 100%;
+    height: 70%; /* Occupe la moitié de l'écran, le graphe prend l'autre moitié */
+    border-top-width: 1px;
+    border-left-width: 0; /* Écrase la règle de la version bureau */
+  }
+
+  .detail-panel-inner {
+    width: 100%; /* Le contenu s'adapte à la largeur de l'écran */
+  }
+  
+  /* Optionnel : réduire un peu la taille de l'image sur mobile pour voir plus de texte */
+  .detail-photo-wrap {
+    height: 160px; 
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #efe9df;
+  border: 1px solid #dcd3c5;
+  color: #3b2d28;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: #7a2035;
+  color: #ffffff;
+  border-color: #7a2035;
+}
+
+.detail-photo-wrap {
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #efe9df;
+  border: 1px solid #dcd3c5;
+  flex-shrink: 0;
+}
+
+.detail-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-main h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #3b2d28;
+  margin-bottom: 4px;
+}
+
+.detail-main .subtext {
+  font-size: 0.85rem;
+  color: #8c7a6b;
+  margin-bottom: 10px;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #ffffff;
+  border: 1px solid #e2d7c5;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1ebd8;
+  font-size: 0.9rem;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detail-row:first-child {
+  padding-top: 0;
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: #8c7a6b;
+}
+
+.detail-row .value {
+  color: #3b2d28;
+  font-weight: 500;
+  text-align: right;
+}
+
+.detail-row .clickable-link {
+  color: #7a2035;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.detail-row .clickable-link:hover {
+  color: #3b2d28;
+}
+
+.tree-link {
+  fill: none;
+  stroke: #a89487;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.tree-union-line {
+  fill: none;
+  stroke: #a3827e;
+  stroke-width: 2px;
+}

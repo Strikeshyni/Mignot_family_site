@@ -1,0 +1,104 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html, #root {
+  width: 100%;
+  height: 100%;
+  background-color: #f7f3ec;
+  color: #3b2d28;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: #efe9df;
+  border-bottom: 1px solid #dcd3c5;
+  z-index: 20;
+}
+
+.brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #7a2035;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-tab {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #8c7a6b;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.nav-tab.active {
+  background: #7a2035;
+  color: #ffffff;
+}
+
+.page-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.genealogy-app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.sub-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: #f1ebd8;
+  border-bottom: 1px solid #e2d7c5;
+}
+
+.search-input, .select-input {
+  background: #ffffff;
+  border: 1px solid #d4c8b8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: black;
+}
+
+.photo-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.network-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}

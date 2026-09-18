@@ -1,0 +1,117 @@
+ID,Nom naissance,Prénom,Autres prénoms,Date naissance,Jour/mois naissance,Date décès,Mère,Père,Conjoint,Sexe,Maison
+ID-0001,Mignot,Louis,Léon,1908,,1933,,,ID-0002,H,Mars
+ID-0002,Alléaume,Marie-Josephe,,1913,,2005,,,ID-0001,F,Mars
+ID-0003,Mignot,Françoise,,1934,,,ID-0002,ID-0001,ID-0004,F,
+ID-0004,Parjadis de Larivière,Pierre,,1930,,,,,ID-0003,H,
+ID-0005,Mignot,Louis,,1935,,1935,ID-0002,ID-0001,,H,
+ID-0006,Mignot,Chantal,,1936,,,ID-0002,ID-0001,ID-0007,F,Chabris
+ID-0007,Cuny,Alain,,1934,,2009,,,ID-0006,H,Chabris
+ID-0008,Mignot,Ostiane,,1938,15/04,2001,ID-0002,ID-0001,ID-0009,F,
+ID-0009,de Villard,Régis,,1937,,2024,,,ID-0008,H,
+ID-0010,Mignot,Anne,,1942,,,ID-0002,ID-0001,ID-0011,F,Savas
+ID-0011,de Metz,Jacques,,1937,,,,,ID-0010,H,Savas
+ID-0012,Mignot,Michèle,,1943,29/09,,ID-0002,ID-0001,ID-0013,F,Mars
+ID-0013,de Montgolfier,Ghislain,,1943,26/07,,,,ID-0012,H,Mars
+ID-0014,Mignot,Paul,,1946,,2025,ID-0002,ID-0001,ID-0015,H,La Ferme
+ID-0015,Benoist d'Anthenay,Fanny,,1949,,,,,ID-0014,F,La Ferme
+ID-0016,Mignot,Jean,,1948,,,ID-0002,ID-0001,ID-0017,H,Mars
+ID-0017,de Chevigny,Béatrix,,1949,,,,,ID-0016,F,Mars
+ID-0018,de Montgolfier,Christophe,,1968,31/03,,ID-0012,ID-0013,ID-0019,H,Mars
+ID-0019,Saucé,Brigitte,,1968,11/08,,,,ID-0018,F,Mars
+ID-0020,de Montgolfier,Inès,,1970,03/02,,ID-0012,ID-0013,ID-0021,F,Mars
+ID-0021,Aubron,Thomas,,1970,04/01,,,,ID-0020,H,Mars
+ID-0022,de Montgolfier,Carole,,1972,20/08,,ID-0012,ID-0013,ID-0023,F,Mars
+ID-0023,Bès-de-Berc,Hervé-Marc,,1971,20/10,,,,ID-0022,H,Mars
+ID-0024,de Montgolfier,Ombeline,,1978,20/04,,ID-0012,ID-0013,ID-0025,F,Mars
+ID-0025,Jacques-Jean,Cédric,,1970,03/02,,,,ID-0024,H,Mars
+ID-0026,Bès-de-Berc,Quentin,,2000,16/08,,ID-0022,ID-0023,ID-0029,H,Mars
+ID-0027,Bès-de-Berc,Aymeric,,2002,16/07,,ID-0022,ID-0023,,H,Mars
+ID-0028,Bès-de-Berc,Etienne,,2005,04/11,,ID-0022,ID-0023,,H,Mars
+ID-0029,Chabac,Bénédicte,,1998,04/08,,,,ID-0026,F,Mars
+ID-0030,de Montgolfier,Mathieu,,1996,06/06,,ID-0019,ID-0018,,H,Mars
+ID-0031,de Montgolfier,Victor,,1998,30/04,,ID-0019,ID-0018,,H,Mars
+ID-0032,de Montgolfier,Théophile,,2000,01/11,,ID-0019,ID-0018,ID-0034,H,Mars
+ID-0033,de Montgolfier,Baptiste,,2002,27/04,,ID-0019,ID-0018,,H,Mars
+ID-0034,de Griffolet d'aurimont,Victoire,,2000,21/04,,,,ID-0032,F,Mars
+ID-0035,Aubron,Nicodème,,1995,02/10,2021,ID-0020,ID-0021,,H,Mars
+ID-0036,Aubron,Noélie,,1998,11/08,,ID-0020,ID-0021,,F,Mars
+ID-0037,Aubron,Alaïs,,2001,07/10,,ID-0020,ID-0021,,F,Mars
+ID-0038,Aubron,Abel,,2003,27/09,,ID-0020,ID-0021,,H,Mars
+ID-0039,Jacques-Jean,Isaya,,2007,13/09,,ID-0024,ID-0025,,H,Mars
+ID-0040,Jacques-Jean,Bao,,2009,27/06,,ID-0024,ID-0025,,F,Mars
+ID-0041,Desanfant,Hugues,,1974,29/07,,,,ID-0042,H,Mars
+ID-0042,Mignot,Marion,,1976,20/04,,ID-0017,ID-0016,ID-0041,F,Mars
+ID-0043,Gindre,Ludovic,,1976,10/04,,,,ID-0044,H,Mars
+ID-0044,Mignot,Louise,,1979,23/12,,ID-0017,ID-0016,ID-0043,F,Mars
+ID-0045,Mandon,Xavier,,1970,15/12,,,,ID-0046,H,Mars
+ID-0046,Mignot,Capucine,,1974,17/09,,ID-0017,ID-0016,ID-0045,F,Mars
+ID-0047,Ligaire,Cédric,,1982,07/03,,,,ID-0048,H,Mars
+ID-0048,Mignot,Cécile,,1984,03/06,,ID-0017,ID-0016,ID-0047,F,Mars
+ID-0049,Desanfant,Henri,,2005,02/07,,ID-0042,ID-0041,,H,Mars
+ID-0050,Desanfant,Astrid,,2007,24/08,,ID-0042,ID-0041,,F,Mars
+ID-0051,Desanfant,Hedwige,,2010,14/10,,ID-0042,ID-0041,,F,Mars
+ID-0052,Desanfant,Jacques,,2013,08/08,,ID-0042,ID-0041,,H,Mars
+ID-0053,Gindre,Domitille,,2007,27/05,,ID-0044,ID-0043,,F,Mars
+ID-0054,Gindre,Grégoire,,2008,17/11,,ID-0044,ID-0043,,H,Mars
+ID-0055,Gindre,François,,2010,29/10,,ID-0044,ID-0043,,H,Mars
+ID-0056,Gindre,Paul,,2014,16/05,,ID-0044,ID-0043,,H,Mars
+ID-0057,Gindre,Victor,,2014,16/05,,ID-0044,ID-0043,,H,Mars
+ID-0058,Mandon,Maylis,,2002,12/03,,ID-0046,ID-0045,,F,Mars
+ID-0059,Mandon,Blanche,,2004,03/03,,ID-0046,ID-0045,,F,Mars
+ID-0060,Mandon,Victoire,,2005,08/08,,ID-0046,ID-0045,,F,Mars
+ID-0061,Mandon,Antoine,,2008,16/03,,ID-0046,ID-0045,,H,Mars
+ID-0062,Ligaire,Castille,,2014,26/08,,ID-0048,ID-0047,,F,Mars
+ID-0063,Ligaire,Clémence,,2016,19/06,,ID-0048,ID-0047,,F,Mars
+ID-0064,Ligaire,Constant,,2018,22/11,,ID-0048,ID-0047,,H,Mars
+ID-0065,Mignot,Emmanuel,,1972,12/10,,ID-0015,ID-0014,ID-0066,H,La Ferme
+ID-0066,Buchez,Florence,,,,,,,ID-0065,F,La Ferme
+ID-0067,Mignot,Louis,,2000,,,ID-0066,ID-0065,,H,La Ferme
+ID-0068,Mignot,Agathe,,2003,,,ID-0066,ID-0065,,F,La Ferme
+ID-0069,Mignot,Soline,,2003,,,ID-0066,ID-0065,,F,La Ferme
+ID-0070,Mignot,Stéphane,,,,,ID-0015,ID-0014,ID-0071,H,La Ferme
+ID-0071,,Juliette,,,,,,,ID-0070,F,La Ferme
+ID-0072,Mignot,Noah,,,,,ID-0071,ID-0070,,H,La Ferme
+ID-0073,Mignot,Cloé,,,,,ID-0071,ID-0070,,F,La Ferme
+ID-0074,Mignot,Léon,,,,,ID-0071,ID-0070,,H,La Ferme
+ID-0075,Mignot,Clémentine,,1977,01/08,,ID-0015,ID-0014,ID-0076,F,La Ferme
+ID-0076,Alaguillaume,Pierre-Henri,,,,,,,ID-0075,H,La Ferme
+ID-0077,Alaguillaume,Marius,,2006,,,ID-0075,ID-0076,,H,La Ferme
+ID-0078,Alaguillaume,Auguste,,2008,,,ID-0075,ID-0076,,H,La Ferme
+ID-0079,Alaguillaume,Suzon,,2009,01/05,,ID-0075,ID-0076,,F,La Ferme
+ID-0080,Alaguillaume,Fleur,,,,,ID-0075,ID-0076,,F,La Ferme
+ID-0081,Alaguillaume,Henriette,,2018,27/06,,ID-0075,ID-0076,,F,La Ferme
+ID-0082,de Metz,Claire,,,,,ID-0010,ID-0011,ID-0083,F,Savas
+ID-0083,Schneiter,Jean-Rémy,,,,,,,ID-0082,H,Savas
+ID-0084,de Metz,Laure,,,,,ID-0010,ID-0011,ID-0085,F,Savas
+ID-0085,Olivier,Pierre,,,,,,,ID-0084,H,Savas
+ID-0086,de Metz,François,,,,,ID-0010,ID-0011,,H,Savas
+ID-0087,de Villard,Claude,,,,,ID-0008,ID-0009,ID-0088,H,
+ID-0088,Debuchy,Armelle,,,,,,,ID-0087,F,
+ID-0089,de Villard,Anne-Claire,,,,,ID-0088,ID-0087,,F,
+ID-0090,de Villard,Marion,,,,,ID-0088,ID-0087,,F,
+ID-0091,de Villard,Laure,,2003,,,ID-0088,ID-0087,,F,
+ID-0092,de Villard,Isabelle,,,,,ID-0008,ID-0009,ID-0093,F,
+ID-0093,Pérouse de Montclos,Joseph,,,,,,,ID-0092,H,
+ID-0094,Pérouse de Montclos,Laetitia,,,,,ID-0092,ID-0093,,F,
+ID-0095,Pérouse de Montclos,Guillaume,,,,,ID-0092,ID-0093,,H,
+ID-0096,Pérouse de Montclos,Didier,,,,,ID-0092,ID-0093,,H,
+ID-0097,de Villard,Loïc,,,,,ID-0008,ID-0009,ID-0098,H,
+ID-0098,Gourlet,Soline,,,,,,,ID-0097,F,
+ID-0099,de Villard,Tatiana,,,,,ID-0098,ID-0097,,F,
+ID-0100,de Villard,Lucile,,,,,ID-0098,ID-0097,,F,
+ID-0101,de Villard,Amélie,,,,,ID-0098,ID-0097,,F,
+ID-0102,de Villard,François,,2005,20/12,,ID-0098,ID-0097,,H,
+ID-0103,de Villard,Coralie,,,,,ID-0008,ID-0009,,F,
+ID-0104,de Villard,Jérôme,,,,,ID-0008,ID-0009,ID-0105,H,
+ID-0105,de Vanssay,France,,,,,,,ID-0104,F,
+ID-0106,de Villard,Marin,,2005,18/02,,ID-0105,ID-0104,,H,
+ID-0107,de Villard,Victoire,,2007,22/03,,ID-0105,ID-0104,,F,
+ID-0108,de Villard,Jean,,2009,05/02,,ID-0105,ID-0104,,H,
+ID-0109,de Villard,Anne-Laure,,,,,ID-0008,ID-0009,ID-0110,F,
+ID-0110,Alaguillaume,Stanislas,,,,,,,ID-0109,H,
+ID-0111,Alaguillaume,Emile,,2012,02/11,,ID-0109,ID-0110,,H,
+ID-0112,Alaguillaume,Gaston,,2020,17/03,,ID-0109,ID-0110,,H,
+ID-0113,,Anne,,,,,,,ID-0114,F,Chabris
+ID-0114,Cuny,Yves,,,,,ID-0006,ID-0007,ID-0113,H,Chabris
+ID-0115,Cuny,Mathilde,,,,,ID-0113,ID-0114,,F,Chabris
+ID-0116,Cuny,Adrien,,,,,ID-0113,ID-0114,,H,Chabris

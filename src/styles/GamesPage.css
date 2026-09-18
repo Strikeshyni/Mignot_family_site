@@ -1,0 +1,696 @@
+/* ==========================================
+   1. CONTAINER GLOBAL & CARTES PRINCIPALES
+   ========================================== */
+.games-container {
+  display: flex;
+  flex-direction: column; /* On aligne en colonne pour gérer la hauteur */
+  height: calc(100vh - 80px); 
+  overflow-y: auto; 
+  
+  padding: 40px 20px;
+  background-color: #faf6f0;
+  box-sizing: border-box;
+}
+
+.game-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 12px 40px rgba(60, 40, 30, 0.08);
+  border: 1px solid #ebdcd0;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  margin: auto; /* Centre la carte si l'écran est grand */
+  flex-shrink: 0; /* Empêche le navigateur d'écraser la carte, ce qui garantit le scroll ! */
+}
+
+/* ==========================================
+   2. ÉCRAN D'ACCUEIL & CRÉATION DE ROOM
+   ========================================== */
+.welcome-card,
+.result-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.welcome-icon,
+.result-icon {
+  font-size: 56px;
+  margin-bottom: 30px;
+}
+
+.game-card h2 {
+  font-size: 28px;
+  color: #3c2820;
+  margin: 0 0 16px 0;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.game-card p {
+  color: #6b584c;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* Formulaire multijoueur (Créer / Rejoindre) */
+.multiplayer-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.join-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px dashed #ebdcd0;
+}
+
+.join-group .text-input {
+  flex: 1;
+}
+
+/* Champs de texte */
+.text-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #ebdcd0;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #3c2820;
+  background: #faf6f0;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.text-input:focus {
+  border-color: #7a2035;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(122, 32, 53, 0.1);
+}
+
+.text-input::placeholder {
+  color: #a89587;
+}
+
+/* ==========================================
+   3. LOBBY & LISTE DES JOUEURS
+   ========================================== */
+.room-code {
+  background: #f7ede8;
+  color: #7a2035;
+  padding: 6px 18px;
+  border-radius: 10px;
+  letter-spacing: 2px;
+  border: 2px dashed #7a2035;
+  font-weight: 800;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.players-list {
+  margin: 28px 0;
+  width: 100%;
+  text-align: left;
+}
+
+.players-list h4 {
+  color: #5a4539;
+  font-size: 15px;
+  margin: 0 0 14px 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.players-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.players-list li {
+  background: #faf6f0;
+  border: 1px solid #ebdcd0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #3c2820;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s;
+}
+
+.players-list li:hover {
+  transform: translateY(-2px);
+}
+
+.waiting-host-text {
+  color: #8c7365;
+  font-style: italic;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+/* ==========================================
+   4. EN-TÊTE DU JEU ET CHRONOMÈTRE
+   ========================================== */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0e6da;
+  font-size: 14px;
+}
+
+.question-counter {
+  color: #8c7365;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.answered-badge {
+  background: #f0e6da;
+  color: #5a4539;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.timer-badge {
+  background: #f3ece4;
+  color: #5a4539;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  transition: background 0.3s, color 0.3s;
+}
+
+.timer-badge.warning {
+  background: #fde8e8;
+  color: #d32f2f;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.prompt {
+  font-size: 20px;
+  color: #2c1e18;
+  margin: 0 0 24px 0;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ==========================================
+   5. PHOTOS DANS LA QUESTION
+   ========================================== */
+.question-photo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.question-photo-wrap img {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f3ece4;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.couple-photos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.photo-frame img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f3ece4;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.couple-plus {
+  font-size: 24px;
+  color: #8c7365;
+  font-weight: 700;
+}
+
+/* ==========================================
+   6. GRILLES ET BOUTONS DE RÉPONSES
+   ========================================== */
+.options-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.text-grid {
+  grid-template-columns: 1fr;
+}
+
+.photo-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.option-btn {
+  background: #faf6f0;
+  border: 2px solid #ebdcd0;
+  border-radius: 14px;
+  padding: 16px 20px;
+  color: #3c2820;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.option-btn:hover:not(:disabled) {
+  border-color: #7a2035;
+  background: #f7ede8;
+  transform: translateY(-2px);
+}
+
+.photo-only-btn {
+  flex-direction: column;
+  padding: 18px 10px;
+}
+
+.option-img-wrapper img {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.option-label {
+  word-break: break-word;
+}
+
+/* États après sélection */
+.option-btn.correct {
+  background: #e8f5e9 !important;
+  border-color: #2e7d32 !important;
+  color: #1b5e20 !important;
+}
+
+.option-btn.wrong {
+  background: #ffebee !important;
+  border-color: #c62828 !important;
+  color: #b71c1c !important;
+}
+
+.option-btn.dimmed {
+  opacity: 0.5;
+}
+
+/* Bannière d'attente globale */
+.waiting-banner {
+  margin-top: 20px;
+  padding: 14px 20px;
+  background: #eef7ee;
+  border: 1px solid #c8e6c9;
+  border-radius: 12px;
+  color: #2e7d32;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ==========================================
+   7. FEEDBACK ET CLASSEMENT INTERMÉDIAIRE
+   ========================================== */
+.feedback-banner {
+  margin-top: 28px;
+  padding: 24px;
+  border-radius: 16px;
+  text-align: left;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.correct-banner {
+  background: #f1f8e9;
+  border: 1px solid #c8e6c9;
+  color: #2e7d32;
+}
+
+.wrong-banner {
+  background: #fff8f8;
+  border: 1px solid #ffcdd2;
+  color: #c62828;
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.feedback-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.feedback-explanation {
+  margin: 0 0 12px 0 !important;
+  font-size: 15px !important;
+  color: #3c2820 !important;
+  line-height: 1.5;
+}
+
+/* Section Classement dans le jeu */
+.multiplayer-leaderboard-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px dashed #ebdcd0;
+}
+
+.multiplayer-leaderboard-section h2 {
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: #faf6f0;
+  border: 1px solid #ebdcd0;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #3c2820;
+  gap: 12px;
+}
+
+.leaderboard-item.highlight {
+  background: #f7ede8;
+  border-color: #7a2035;
+  color: #7a2035;
+}
+
+/* ==========================================
+   8. BOUTONS ACTION
+   ========================================== */
+.primary-btn,
+.secondary-btn,
+.next-btn {
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.primary-btn {
+  background: #7a2035;
+  color: #ffffff;
+  border: none;
+  width: 100%;
+}
+
+.primary-btn:hover {
+  background: #5c1828;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(122, 32, 53, 0.25);
+}
+
+.secondary-btn {
+  background: transparent;
+  color: #7a2035;
+  border: 2px solid #7a2035;
+  white-space: nowrap;
+}
+
+.secondary-btn:hover {
+  background: #7a2035;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.next-btn {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 12px;
+  background: #7a2035;
+  color: #ffffff;
+  border: none;
+}
+
+.mt-3 {
+  margin-top: 16px;
+}
+
+/* ==========================================
+   9. MINI-JEU : RANGER PAR ÂGE (ORDER_BY_AGE)
+   ========================================== */
+.order-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: #faf6f0;
+  border: 2px solid #ebdcd0;
+  border-radius: 14px;
+  cursor: grab;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.order-item:active {
+  cursor: grabbing;
+}
+
+.order-item.dragging {
+  opacity: 0.4;
+  transform: scale(0.98);
+}
+
+.order-item-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #3c2820;
+}
+
+.order-item-index {
+  color: #8c7365;
+  font-size: 15px;
+}
+
+.order-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.order-btn {
+  background: #ffffff;
+  border: 1px solid #dcd3c5;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #5a4539;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.order-btn:hover:not(:disabled) {
+  background: #f0e6da;
+}
+
+.order-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.validate-order-btn {
+  width: 100%;
+}
+
+.order-item.order-correct {
+  background: #e8f5e9;
+  border-color: #2e7d32;
+  color: #1b5e20;
+}
+
+.order-item.order-wrong {
+  background: #ffebee;
+  border-color: #c62828;
+  color: #b71c1c;
+}
+
+/* ==========================================
+   10. MINI-JEU : SLIDER ENFANTS (COUNT_CHILDREN)
+   ========================================== */
+.slider-question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin: 20px 0;
+}
+
+.slider-wrap {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.slider-val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #3c2820;
+  background: #f0e6da;
+  padding: 8px 24px;
+  border-radius: 24px;
+  border: 1px solid #d3c4b5;
+}
+
+.children-slider {
+  width: 100%;
+  height: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  accent-color: #7a2035;
+}
+
+.validate-slider-btn {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* Details enfants dans feedback */
+.children-details-container {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
+  width: 100%;
+  text-align: left;
+}
+
+.children-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.child-detail-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.child-detail-card img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+  border: 2px solid #7a2035;
+}
+
+.child-detail-card span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3c2820;
+  word-break: break-word;
+}
+
+.option-btn.selected {
+  background: #f0e6da !important;
+  border-color: #8c7365 !important;
+  color: #3c2820 !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.order-item.selected {
+  background: #f0e6da;
+  border-color: #8c7365;
+}
